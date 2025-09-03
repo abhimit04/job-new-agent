@@ -603,12 +603,15 @@
               job_count: currentJobData.results.stats.totalUnique,
               report_summary: currentJobData.results.summary || "No AI summary available.",
               // Create a structured list of jobs for the email template
-              jobs_list: currentJobData.results.jobs.map(job =>
-                  `• <strong>${escapeHtml(job.title)}</strong> at ${escapeHtml(job.company)}<br>
-                  <em>Location:</em> ${escapeHtml(job.location)} | <em>Source:</em> ${escapeHtml(job.source)}<br>
-                  <a href="${job.link}" target="_blank">View Job</a>`
-              ).join("<br><br>")
-          };
+                job_list: currentJobData.results.jobs.slice(0,20),
+                report_date: new Date().toLocaleString()
+                };
+<!--            jobs_list: currentJobData.results.jobs.map(job =>-->
+<!--                  `• <strong>${escapeHtml(job.title)}</strong> at ${escapeHtml(job.company)}<br>-->
+<!--                  <em>Location:</em> ${escapeHtml(job.location)} | <em>Source:</em> ${escapeHtml(job.source)}<br>-->
+<!--                  <a href="${job.link}" target="_blank">View Job</a>`-->
+<!--              ).join("<br><br>")-->
+
 
           // Send the email using the EmailJS SDK
           const result = await emailjs.send("service_ofgmur4", "template_zxj7hsg", templateParams);
