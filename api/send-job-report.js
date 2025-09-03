@@ -182,58 +182,58 @@ async function sendViaEmailJS({ userEmail, jobType, location, jobs, summary, sta
 }
 
 // Resend Integration (Modern, developer-friendly)
-async function sendViaResend({ userEmail, jobType, location, jobs, summary, stats, timestamp }) {
-  const { Resend } = await import('resend');
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
-  const emailContent = generateJobReportData({ userEmail, jobType, location, jobs, summary, stats, timestamp });
-
-  const emailData = {
-    from: 'AI Job Agent <noreply@yourdomain.com>', // Replace with your verified domain
-    to: [userEmail],
-    subject: `🎯 Your Job Search Report: ${jobs.length} ${jobType} opportunities in ${location}`,
-    html: emailContent.html,
-    text: emailContent.text
-  };
-
-  const result = await resend.emails.send(emailData);
-
-  return {
-    success: true,
-    message: `Job report sent successfully to ${userEmail} via Resend`,
-    service: 'Resend',
-    jobCount: jobs.length,
-    messageId: result.id,
-    timestamp: new Date().toISOString(),
-  };
-}
+//async function sendViaResend({ userEmail, jobType, location, jobs, summary, stats, timestamp }) {
+//  const { Resend } = await import('resend');
+//  const resend = new Resend(process.env.RESEND_API_KEY);
+//
+//  const emailContent = generateJobReportData({ userEmail, jobType, location, jobs, summary, stats, timestamp });
+//
+//  const emailData = {
+//    from: 'AI Job Agent <noreply@yourdomain.com>', // Replace with your verified domain
+//    to: [userEmail],
+//    subject: `🎯 Your Job Search Report: ${jobs.length} ${jobType} opportunities in ${location}`,
+//    html: emailContent.html,
+//    text: emailContent.text
+//  };
+//
+//  const result = await resend.emails.send(emailData);
+//
+//  return {
+//    success: true,
+//    message: `Job report sent successfully to ${userEmail} via Resend`,
+//    service: 'Resend',
+//    jobCount: jobs.length,
+//    messageId: result.id,
+//    timestamp: new Date().toISOString(),
+//  };
+//}
 
 // SendGrid Integration (Popular enterprise choice)
-async function sendViaSendGrid({ userEmail, jobType, location, jobs, summary, stats, timestamp }) {
-  const sgMail = await import('@sendgrid/mail');
-  sgMail.default.setApiKey(process.env.SENDGRID_API_KEY);
-
-  const emailContent = generateJobReportData({ userEmail, jobType, location, jobs, summary, stats, timestamp });
-
-  const msg = {
-    to: userEmail,
-    from: 'noreply@yourdomain.com', // Replace with your verified sender
-    subject: `🎯 Your Job Search Report: ${jobs.length} ${jobType} opportunities in ${location}`,
-    text: emailContent.text,
-    html: emailContent.html,
-  };
-
-  const result = await sgMail.default.send(msg);
-
-  return {
-    success: true,
-    message: `Job report sent successfully to ${userEmail} via SendGrid`,
-    service: 'SendGrid',
-    jobCount: jobs.length,
-    messageId: result[0].headers['x-message-id'],
-    timestamp: new Date().toISOString(),
-  };
-}
+//async function sendViaSendGrid({ userEmail, jobType, location, jobs, summary, stats, timestamp }) {
+//  const sgMail = await import('@sendgrid/mail');
+//  sgMail.default.setApiKey(process.env.SENDGRID_API_KEY);
+//
+//  const emailContent = generateJobReportData({ userEmail, jobType, location, jobs, summary, stats, timestamp });
+//
+//  const msg = {
+//    to: userEmail,
+//    from: 'noreply@yourdomain.com', // Replace with your verified sender
+//    subject: `🎯 Your Job Search Report: ${jobs.length} ${jobType} opportunities in ${location}`,
+//    text: emailContent.text,
+//    html: emailContent.html,
+//  };
+//
+//  const result = await sgMail.default.send(msg);
+//
+//  return {
+//    success: true,
+//    message: `Job report sent successfully to ${userEmail} via SendGrid`,
+//    service: 'SendGrid',
+//    jobCount: jobs.length,
+//    messageId: result[0].headers['x-message-id'],
+//    timestamp: new Date().toISOString(),
+//  };
+//}
 
 // Generate email content (same as before but simplified)
 function generateJobReportData({ userEmail, jobType, location, jobs, summary, stats, timestamp }) {
