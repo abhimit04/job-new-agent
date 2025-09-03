@@ -20,93 +20,93 @@ export default async function handler(req, res) {
     let serpJobs = [];
     let jsearchJobs = [];
     const errors = [];
+    let nextPageToken = null;
 
     // ========== Fetch from SerpAPI ==========
-    if (serpApiKey) {
-      try {
-        console.log("📡 Fetching from SerpAPI...");
+if (serpApiKey) {
+  try {
+    console.log("📡 Fetching from SerpAPI with pagination...");
 
-        // Try multiple pages with proper pagination
-        for (let page = 0; page < 3; page++) {
-          const params = new URLSearchParams({
-            engine: "google_jobs",
-            q: jobType,
-            location: location,
-            api_key: serpApiKey,
-            hl: "en",
-            gl: "in"
-          });
+    let nextPageToken = null;
+    for (let page = 0; page < 3; page++) { // fetch up to 3 pages
+      const params = new URLSearchParams({
+        engine: "google_jobs",
+        q: jobType,
+        location: location,
+        api_key: serpApiKey,
+        hl: "en",
+        gl: "in"
+      });
 
-          // Add pagination token if available
-          if (page > 0 && serpJobs.length > 0) {
-            // For subsequent pages, we need to use start parameter
-            params.set("start", (page * 10).toString());
-          }
-
-          const url = `https://serpapi.com/search.json?${params.toString()}`;
-          console.log(`🔍 SerpAPI Page ${page + 1}:`, url.replace(serpApiKey, "***"));
-
-          const response = await fetch(url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; JobAgent/1.0)',
-            },
-            timeout: 30000
-          });
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`❌ SerpAPI Error ${response.status}:`, errorText);
-            errors.push(`SerpAPI Error ${response.status}: ${errorText}`);
-            break;
-          }
-
-          const data = await response.json();
-          console.log("📊 SerpAPI Response structure:", {
-            hasJobsResults: !!data.jobs_results,
-            jobsCount: data.jobs_results?.length || 0,
-            hasPagination: !!data.serpapi_pagination,
-            hasNextPage: !!data.serpapi_pagination?.next_page_token
-          });
-
-          if (data.jobs_results && data.jobs_results.length > 0) {
-            const pageJobs = data.jobs_results.map((job, index) => ({
-              id: job.job_id || `serp-${page}-${index}`,
-              title: job.title || "No Title",
-              company: job.company_name || "Unknown Company",
-              location: job.location || location,
-              date: job.detected_extensions?.posted_at ||
-                    job.extensions?.find(ext => ext.includes("ago"))?.trim() ||
-                    "Date not specified",
-              source: job.via || "Google Jobs",
-              link: job.apply_options?.[0]?.link ||
-                    job.share_link ||
-                    `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company_name)}`,
-              description: job.description || "",
-              salary: job.detected_extensions?.salary || "Not specified"
-            }));
-
-            serpJobs.push(...pageJobs);
-            console.log(`✅ Added ${pageJobs.length} jobs from SerpAPI page ${page + 1}`);
-          } else {
-            console.log(`⚠️ No jobs found on SerpAPI page ${page + 1}`);
-            break;
-          }
-
-          // Stop if no more pages
-          if (!data.serpapi_pagination?.next_page_token && page === 0) {
-            break;
-          }
-
-          // Rate limiting delay
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-      } catch (error) {
-        console.error("❌ SerpAPI fetch failed:", error.message);
-        errors.push(`SerpAPI Error: ${error.message}`);
+      // Add next_page_token if available
+      if (nextPageToken) {
+        params.set("next_page_token", nextPageToken);
       }
-    } else {
-      console.log("⚠️ SerpAPI key not provided");
+
+      const url = `https://serpapi.com/search.json?${params.toString()}`;
+      console.log(`🔍 SerpAPI Page ${page + 1}:`, url.replace(serpApiKey, "***"));
+
+      const response = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; JobAgent/1.0)" }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ SerpAPI Error ${response.status}:`, errorText);
+        errors.push(`SerpAPI Error ${response.status}: ${errorText}`);
+        break;
+      }
+
+      const data = await response.json();
+      console.log("📊 SerpAPI Response:", {
+        jobsCount: data.jobs_results?.length || 0,
+        hasNextPage: !!data.serpapi_pagination?.next_page_token
+      });
+
+      if (data.jobs_results?.length > 0) {
+        const pageJobs = data.jobs_results.map((job, index) => ({
+          id: job.job_id || `serp-${page}-${index}`,
+          title: job.title || "No Title",
+          company: job.company_name || "Unknown Company",
+          location: job.location || location,
+          date: job.detected_extensions?.posted_at ||
+                job.extensions?.find(ext => ext.includes("ago"))?.trim() ||
+                "Date not specified",
+          source: job.via || "Google Jobs",
+          link: job.apply_options?.[0]?.link ||
+                job.share_link ||
+                `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company_name)}`,
+          description: job.description || "",
+          salary: job.detected_extensions?.salary || "Not specified"
+        }));
+
+        serpJobs.push(...pageJobs);
+        console.log(`✅ Added ${pageJobs.length} jobs from SerpAPI page ${page + 1}`);
+      } else {
+        console.log(`⚠️ No jobs found on SerpAPI page ${page + 1}`);
+        break;
+      }
+
+      // Prepare token for next loop
+      if (data.serpapi_pagination?.next_page_token) {
+        nextPageToken = data.serpapi_pagination.next_page_token;
+        console.log(`➡️ Found next_page_token for page ${page + 2}`);
+      } else {
+        console.log("⏹️ No more pages available.");
+        break;
+      }
+
+      // Delay so SerpAPI can activate token
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
+  } catch (error) {
+    console.error("❌ SerpAPI fetch failed:", error.message);
+    errors.push(`SerpAPI Error: ${error.message}`);
+  }
+} else {
+  console.log("⚠️ SerpAPI key not provided");
+}
+
 
     // ========== Fetch from JSearch ==========
     if (jsearchApiKey) {
@@ -286,7 +286,7 @@ Keep the analysis factual and based only on the provided data.
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_TO && finalJobs.length > 0) {
       try {
         console.log("📧 Sending email report...");
-        const transporter = nodemailer.createTransporter({
+        const transporter = nodemailer.createTransport({
           service: "gmail",
           auth: {
             user: process.env.EMAIL_USER,
