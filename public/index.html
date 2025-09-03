@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Job Agent</title>
+</head>
+<body>
+  <h2>Find Jobs</h2>
+  <form action="/api/jobs" method="GET">
+    <label for="jobType">Job Type:</label>
+    <input type="text" id="jobType" name="jobType" placeholder="e.g. Project Manager, Java Developer" required><br><br>
+
+    <label for="location">Location:</label>
+    <input type="text" id="location" name="location" placeholder="e.g. Bangalore, Pune" required><br><br>
+
+    <label for="experience">Experience (in years):</label>
+    <input type="number" id="experience" name="experience" min="0" max="40" placeholder="e.g. 5"><br><br>
+
+    <button type="submit">Search Jobs</button>
+  </form>
+</body>
+</html>
