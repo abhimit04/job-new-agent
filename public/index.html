@@ -651,30 +651,30 @@
 <!--      return emailRegex.test(email);-->
 <!--  }-->
 
-<!--  // Allow Enter key to trigger search-->
-<!--  document.addEventListener('keypress', function(e) {-->
-<!--      if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {-->
-<!--          document.getElementById('fetchJobs').click();-->
-<!--      }-->
-<!--  });-->
+  // Allow Enter key to trigger search
+  document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {
+          document.getElementById('fetchJobs').click();
+      }
+  });
 
-<!--  // Utility function to escape HTML to prevent XSS-->
-<!--  function escapeHtml(text) {-->
-<!--      const map = {-->
-<!--          '&': '&amp;',-->
-<!--          '<': '&lt;',-->
-<!--          '>': '&gt;',-->
-<!--          '"': '&quot;',-->
-<!--          "'": '&#039;'-->
-<!--      };-->
-<!--      return text.replace(/[&<>"']/g, function(m) { return map[m]; });-->
-<!--  }-->
+// Utility function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+      const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+  }
 
-<!--  // Auto-focus on first input when page loads-->
-<!--  window.addEventListener('load', function() {-->
-<!--      document.getElementById('jobType').focus();-->
-<!--  });-->
-<!--</script>-->
+  // Auto-focus on first input when page loads
+  window.addEventListener('load', function() {
+      document.getElementById('jobType').focus();
+  });
+</script>
 </body>
 <footer>
   © 2025 AbhiAI. All rights reserved.
