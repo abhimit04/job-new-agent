@@ -551,130 +551,130 @@
       }
   });
 
-  // 3. Email Report Functionality using EmailJS
-  document.getElementById("sendEmailBtn").addEventListener("click", async (e) => {
-      e.preventDefault();
+<!--  // 3. Email Report Functionality using EmailJS-->
+<!--  document.getElementById("sendEmailBtn").addEventListener("click", async (e) => {-->
+<!--      e.preventDefault();-->
 
-      const emailBtn = document.getElementById("sendEmailBtn");
-      const userEmail = document.getElementById("userEmail").value.trim();
-      const emailSection = document.getElementById("emailSection");
+<!--      const emailBtn = document.getElementById("sendEmailBtn");-->
+<!--      const userEmail = document.getElementById("userEmail").value.trim();-->
+<!--      const emailSection = document.getElementById("emailSection");-->
 
-      // Remove any existing status messages
-      const existingStatus = emailSection.querySelector('.email-success, .email-error');
-      if (existingStatus) {
-          existingStatus.remove();
-      }
+<!--      // Remove any existing status messages-->
+<!--      const existingStatus = emailSection.querySelector('.email-success, .email-error');-->
+<!--      if (existingStatus) {-->
+<!--          existingStatus.remove();-->
+<!--      }-->
 
-      // Validation
-      if (!userEmail) {
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'email-error';
-          errorDiv.innerHTML = '❌ Please enter your email address';
-          emailSection.appendChild(errorDiv);
-          return;
-      }
+<!--      // Validation-->
+<!--      if (!userEmail) {-->
+<!--          const errorDiv = document.createElement('div');-->
+<!--          errorDiv.className = 'email-error';-->
+<!--          errorDiv.innerHTML = '❌ Please enter your email address';-->
+<!--          emailSection.appendChild(errorDiv);-->
+<!--          return;-->
+<!--      }-->
 
-      if (!isValidEmail(userEmail)) {
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'email-error';
-          errorDiv.innerHTML = '❌ Please enter a valid email address';
-          emailSection.appendChild(errorDiv);
-          return;
-      }
+<!--      if (!isValidEmail(userEmail)) {-->
+<!--          const errorDiv = document.createElement('div');-->
+<!--          errorDiv.className = 'email-error';-->
+<!--          errorDiv.innerHTML = '❌ Please enter a valid email address';-->
+<!--          emailSection.appendChild(errorDiv);-->
+<!--          return;-->
+<!--      }-->
 
-      if (!currentJobData || !currentJobData.results.jobs || currentJobData.results.jobs.length === 0) {
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'email-error';
-          errorDiv.innerHTML = '❌ No job data to send. Please search for jobs first.';
-          emailSection.appendChild(errorDiv);
-          return;
-      }
+<!--      if (!currentJobData || !currentJobData.results.jobs || currentJobData.results.jobs.length === 0) {-->
+<!--          const errorDiv = document.createElement('div');-->
+<!--          errorDiv.className = 'email-error';-->
+<!--          errorDiv.innerHTML = '❌ No job data to send. Please search for jobs first.';-->
+<!--          emailSection.appendChild(errorDiv);-->
+<!--          return;-->
+<!--      }-->
 
-      // Show loading state
-      emailBtn.disabled = true;
-      emailBtn.innerHTML = '📧 Sending...';
+<!--      // Show loading state-->
+<!--      emailBtn.disabled = true;-->
+<!--      emailBtn.innerHTML = '📧 Sending...';-->
 
-      try {
-          // Prepare the template parameters for EmailJS
-          const templateParams = {
-              to_email: userEmail,
-              job_type: currentJobData.searchParams.jobType,
-              location: currentJobData.searchParams.location,
-              job_count: currentJobData.results.stats.totalUnique,
-              report_summary: currentJobData.results.summary || "No AI summary available.",
-              // Create a structured list of jobs for the email template
-                job_list: currentJobData.results.jobs.slice(0,20),
-                report_date: new Date().toLocaleString()
-                };
-<!--            jobs_list: currentJobData.results.jobs.map(job =>-->
-<!--                  `• <strong>${escapeHtml(job.title)}</strong> at ${escapeHtml(job.company)}<br>-->
-<!--                  <em>Location:</em> ${escapeHtml(job.location)} | <em>Source:</em> ${escapeHtml(job.source)}<br>-->
-<!--                  <a href="${job.link}" target="_blank">View Job</a>`-->
-<!--              ).join("<br><br>")-->
+<!--      try {-->
+<!--          // Prepare the template parameters for EmailJS-->
+<!--          const templateParams = {-->
+<!--              to_email: userEmail,-->
+<!--              job_type: currentJobData.searchParams.jobType,-->
+<!--              location: currentJobData.searchParams.location,-->
+<!--              job_count: currentJobData.results.stats.totalUnique,-->
+<!--              report_summary: currentJobData.results.summary || "No AI summary available.",-->
+<!--              // Create a structured list of jobs for the email template-->
+<!--                job_list: currentJobData.results.jobs.slice(0,20),-->
+<!--                report_date: new Date().toLocaleString()-->
+<!--                };-->
+<!--&lt;!&ndash;            jobs_list: currentJobData.results.jobs.map(job =>&ndash;&gt;-->
+<!--&lt;!&ndash;                  `• <strong>${escapeHtml(job.title)}</strong> at ${escapeHtml(job.company)}<br>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <em>Location:</em> ${escapeHtml(job.location)} | <em>Source:</em> ${escapeHtml(job.source)}<br>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <a href="${job.link}" target="_blank">View Job</a>`&ndash;&gt;-->
+<!--&lt;!&ndash;              ).join("<br><br>")&ndash;&gt;-->
 
 
-          // Send the email using the EmailJS SDK
-          const result = await emailjs.send("service_ofgmur4", "template_zxj7hsg", templateParams);
-          console.log("Email send result:", result);
+<!--          // Send the email using the EmailJS SDK-->
+<!--          const result = await emailjs.send("service_ofgmur4", "template_zxj7hsg", templateParams);-->
+<!--          console.log("Email send result:", result);-->
 
-          // Show success message
-          const successDiv = document.createElement('div');
-          successDiv.className = 'email-success';
-          successDiv.innerHTML = `
-              ✅ Report sent successfully to ${userEmail}!
-              <br><small>Check your inbox (and spam folder) for the job report.</small>
-          `;
-          emailSection.appendChild(successDiv);
+<!--          // Show success message-->
+<!--          const successDiv = document.createElement('div');-->
+<!--          successDiv.className = 'email-success';-->
+<!--          successDiv.innerHTML = `-->
+<!--              ✅ Report sent successfully to ${userEmail}!-->
+<!--              <br><small>Check your inbox (and spam folder) for the job report.</small>-->
+<!--          `;-->
+<!--          emailSection.appendChild(successDiv);-->
 
-          // Clear email input
-          document.getElementById("userEmail").value = '';
+<!--          // Clear email input-->
+<!--          document.getElementById("userEmail").value = '';-->
 
-      } catch (error) {
-          console.error("Email send failed:", error);
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'email-error';
-          errorDiv.innerHTML = `
-              ❌ Failed to send email: ${error.text || error.message}
-              <br><small>Please try again or check your EmailJS configuration.</small>
-          `;
-          emailSection.appendChild(errorDiv);
-      } finally {
-          // Reset button
-          emailBtn.disabled = false;
-          emailBtn.innerHTML = '📧 Send Report';
-      }
-  });
+<!--      } catch (error) {-->
+<!--          console.error("Email send failed:", error);-->
+<!--          const errorDiv = document.createElement('div');-->
+<!--          errorDiv.className = 'email-error';-->
+<!--          errorDiv.innerHTML = `-->
+<!--              ❌ Failed to send email: ${error.text || error.message}-->
+<!--              <br><small>Please try again or check your EmailJS configuration.</small>-->
+<!--          `;-->
+<!--          emailSection.appendChild(errorDiv);-->
+<!--      } finally {-->
+<!--          // Reset button-->
+<!--          emailBtn.disabled = false;-->
+<!--          emailBtn.innerHTML = '📧 Send Report';-->
+<!--      }-->
+<!--  });-->
 
-  // Email validation helper
-  function isValidEmail(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
-  }
+<!--  // Email validation helper-->
+<!--  function isValidEmail(email) {-->
+<!--      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;-->
+<!--      return emailRegex.test(email);-->
+<!--  }-->
 
-  // Allow Enter key to trigger search
-  document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {
-          document.getElementById('fetchJobs').click();
-      }
-  });
+<!--  // Allow Enter key to trigger search-->
+<!--  document.addEventListener('keypress', function(e) {-->
+<!--      if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {-->
+<!--          document.getElementById('fetchJobs').click();-->
+<!--      }-->
+<!--  });-->
 
-  // Utility function to escape HTML to prevent XSS
-  function escapeHtml(text) {
-      const map = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-  }
+<!--  // Utility function to escape HTML to prevent XSS-->
+<!--  function escapeHtml(text) {-->
+<!--      const map = {-->
+<!--          '&': '&amp;',-->
+<!--          '<': '&lt;',-->
+<!--          '>': '&gt;',-->
+<!--          '"': '&quot;',-->
+<!--          "'": '&#039;'-->
+<!--      };-->
+<!--      return text.replace(/[&<>"']/g, function(m) { return map[m]; });-->
+<!--  }-->
 
-  // Auto-focus on first input when page loads
-  window.addEventListener('load', function() {
-      document.getElementById('jobType').focus();
-  });
-</script>
+<!--  // Auto-focus on first input when page loads-->
+<!--  window.addEventListener('load', function() {-->
+<!--      document.getElementById('jobType').focus();-->
+<!--  });-->
+<!--</script>-->
 </body>
 <footer>
   © 2025 AbhiAI. All rights reserved.
