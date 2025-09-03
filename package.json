@@ -1,5 +1,5 @@
 {
-  "name": "job-list-agent",
+  "name": "job-new-agent",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
