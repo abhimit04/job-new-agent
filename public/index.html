@@ -2,291 +2,316 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Job Agent</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-
-    .container {
-      background: #fff;
-      max-width: 900px;
-      width: 100%;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-
-    h2 {
-      margin-bottom: 1rem;
-      color: #444;
-      text-align: center;
-    }
-
-    button {
-      background: linear-gradient(135deg, #43e97b, #38f9d7);
-      border: none;
-      color: #fff;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      display: block;
-      margin: 0 auto 2rem auto;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-    }
-
-    #output {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-
-    .job-card {
-      background: #f9f9fb;
-      border-radius: 12px;
-      padding: 1.2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .job-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-    }
-
-    .job-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      color: #222;
-    }
-
-    .job-company {
-      font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 0.3rem;
-    }
-
-    .job-location {
-      font-size: 0.9rem;
-      color: #777;
-      margin-bottom: 0.5rem;
-    }
-
-    .job-date {
-      font-size: 0.8rem;
-      color: #999;
-      margin-bottom: 0.8rem;
-    }
-
-    .job-link {
-      display: inline-block;
-      background: #667eea;
-      color: #fff;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: background 0.2s ease;
-    }
-
-    .job-link:hover {
-      background: #4a5fc1;
-    }
-  </style>
-</head>
-<body>
-<<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Job Agent</title>
   <style>
     body {
-        font-family: Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
-        background-color: #f5f5f5;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
     }
     .container {
         background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         margin-bottom: 20px;
     }
     h2 {
         color: #333;
         text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+        font-weight: 300;
+    }
+    h3 {
+        color: #666;
+        text-align: center;
+        margin-bottom: 40px;
+        font-weight: 400;
+    }
+    .form-row {
+        display: flex;
+        gap: 20px;
         margin-bottom: 30px;
     }
     .form-group {
-        margin-bottom: 20px;
+        flex: 1;
     }
     label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
+        margin-bottom: 8px;
+        font-weight: 600;
         color: #555;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     input[type="text"] {
         width: 100%;
-        padding: 12px;
-        border: 2px solid #ddd;
-        border-radius: 5px;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
         font-size: 16px;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
     input[type="text"]:focus {
-        border-color: #4CAF50;
+        border-color: #667eea;
         outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
     }
-    button {
-        background-color: #4CAF50;
+    .search-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 12px 24px;
+        padding: 15px 40px;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         font-size: 16px;
+        font-weight: 600;
         width: 100%;
         margin-top: 10px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    button:hover {
-        background-color: #45a049;
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
     }
-    button:disabled {
-        background-color: #cccccc;
+    .search-btn:active {
+        transform: translateY(0);
+    }
+    .search-btn:disabled {
+        background: #cccccc;
         cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
     #output {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 5px;
-        min-height: 100px;
+        margin-top: 40px;
+    }
+    .status-message {
+        text-align: center;
+        padding: 60px 40px;
+        color: #666;
+        font-size: 18px;
+        border-radius: 10px;
+        background: #f8f9fa;
     }
     .job-card {
         background: white;
-        padding: 20px;
-        margin: 15px 0;
-        border-radius: 8px;
-        border-left: 4px solid #4CAF50;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: transform 0.2s;
+        padding: 25px;
+        margin: 20px 0;
+        border-radius: 12px;
+        border: 1px solid #e1e5e9;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .job-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     }
     .job-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border-color: #667eea;
     }
     .job-title {
-        font-size: 18px;
-        font-weight: bold;
+        font-size: 22px;
+        font-weight: 700;
         color: #333;
         margin-bottom: 8px;
+        line-height: 1.3;
     }
     .job-company {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 8px;
+        font-size: 18px;
+        color: #667eea;
+        margin-bottom: 15px;
+        font-weight: 600;
     }
     .job-details {
         display: flex;
-        gap: 20px;
-        margin-bottom: 12px;
+        gap: 25px;
+        margin-bottom: 15px;
         flex-wrap: wrap;
     }
     .job-detail {
-        color: #888;
+        color: #666;
         font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .job-description {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
     }
     .job-link {
-        background-color: #007bff;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
-        padding: 8px 16px;
+        padding: 12px 24px;
         text-decoration: none;
-        border-radius: 4px;
+        border-radius: 25px;
         font-size: 14px;
-        display: inline-block;
-        margin-top: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .job-link:hover {
-        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
     }
     .stats {
-        background: #e8f5e8;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
         text-align: center;
+        border: 1px solid #e1e5e9;
+    }
+    .stats-number {
+        font-size: 2em;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0 10px;
     }
     .error {
-        background: #ffe6e6;
-        color: #d00;
-        padding: 15px;
-        border-radius: 5px;
+        background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+        color: #c62828;
+        padding: 20px;
+        border-radius: 10px;
         margin-bottom: 20px;
+        border-left: 4px solid #e57373;
+    }
+    .error h4 {
+        margin-top: 0;
+        color: #d32f2f;
+    }
+    .error a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .error a:hover {
+        text-decoration: underline;
     }
     .loading {
         text-align: center;
-        color: #666;
+        color: #667eea;
         font-size: 18px;
+        padding: 40px;
+    }
+    .spinner {
+        width: 40px;
+        height: 40px;
+        margin: 20px auto;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .ai-summary {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 40px;
+        border-left: 6px solid #667eea;
+    }
+    .ai-summary h3 {
+        margin-top: 0;
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .debug-info {
         background: #fff3cd;
         border: 1px solid #ffeaa7;
         padding: 15px;
-        border-radius: 5px;
+        border-radius: 8px;
         margin-top: 20px;
-        font-family: monospace;
+        font-family: 'Courier New', monospace;
         font-size: 12px;
+    }
+    @media (max-width: 768px) {
+        .form-row {
+            flex-direction: column;
+        }
+        .job-details {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .container {
+            padding: 20px;
+        }
+        body {
+            padding: 10px;
+        }
     }
   </style>
 </head>
 <body>
 <div class="container">
   <h2>🤖 AI Job Agent</h2>
-  <h3>Find Jobs</h3>
+  <h3>Discover Your Next Opportunity</h3>
 
-  <div class="form-group">
-    <label for="jobType">Job Type:</label>
-    <input type="text" id="jobType" name="jobType" placeholder="e.g. Project Manager, Java Developer, Software Engineer" value="Project Manager" required>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="jobType">Job Type</label>
+      <input type="text" id="jobType" name="jobType" placeholder="e.g. Project Manager, Software Engineer" value="Project Manager" required>
+    </div>
+    <div class="form-group">
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" placeholder="e.g. Bengaluru, Mumbai, Delhi" value="Bengaluru" required>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label for="location">Location:</label>
-    <input type="text" id="location" name="location" placeholder="e.g. Bangalore, Bengaluru, Mumbai" value="Bengaluru" required>
-  </div>
-
-  <button id="fetchJobs">🔍 Fetch Jobs</button>
+  <button id="fetchJobs" class="search-btn">
+    🔍 Search Jobs
+  </button>
 
   <div id="output">
-    <div style="text-align: center; color: #666; padding: 40px;">
-      Click "Fetch Jobs" to search for opportunities...
+    <div class="status-message">
+      Ready to find your dream job? Enter your criteria above and click "Search Jobs" to get started! ✨
     </div>
   </div>
 </div>
 
 <script>
+  // Configuration - Update this URL to match your API endpoint
+  const API_BASE_URL = window.location.origin; // Uses current domain
+  // If your API is on a different port/domain, change this to:
+  // const API_BASE_URL = 'http://localhost:3000'; // For local development
+  // const API_BASE_URL = 'https://your-api-domain.com'; // For production
+
   document.getElementById("fetchJobs").addEventListener("click", async (e) => {
       e.preventDefault();
 
@@ -297,25 +322,32 @@
 
       // Validation
       if (!jobType || !location) {
-          output.innerHTML = '<div class="error">❌ Please fill in both Job Type and Location fields.</div>';
+          output.innerHTML = '<div class="error"><h4>❌ Missing Information</h4><p>Please fill in both Job Type and Location fields.</p></div>';
           return;
       }
 
-      // Disable button and show loading
+      // Show loading state
       button.disabled = true;
-      button.textContent = "⏳ Searching...";
-      output.innerHTML = '<div class="loading">🔍 Searching for jobs... This may take a few seconds.</div>';
+      button.innerHTML = '⏳ Searching...';
+      output.innerHTML = `
+          <div class="loading">
+              <div class="spinner"></div>
+              <p>🔍 Searching for <strong>${jobType}</strong> jobs in <strong>${location}</strong>...</p>
+              <p style="font-size: 14px; opacity: 0.7;">This may take 10-30 seconds depending on API response times</p>
+          </div>
+      `;
 
       try {
-          // Build the API URL with parameters
+          // Build API URL
           const params = new URLSearchParams({
               jobType: jobType,
               location: location
           });
 
-          console.log("Making request to:", `/api/job-agent?${params.toString()}`);
+          const apiUrl = `${API_BASE_URL}/api/job-agent?${params.toString()}`;
+          console.log("Making request to:", apiUrl);
 
-          const response = await fetch(`/api/job-agent?${params.toString()}`, {
+          const response = await fetch(apiUrl, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',
@@ -332,36 +364,42 @@
           // Clear output
           output.innerHTML = "";
 
-          // Show debug info if no API keys are configured
+          // Show API configuration issues
           if (data.debug && (!data.debug.serpApiConfigured && !data.debug.jsearchConfigured)) {
               output.innerHTML += `
                   <div class="error">
-                      <h4>⚠️ Configuration Issue</h4>
-                      <p>No API keys are configured. Please set up your environment variables:</p>
+                      <h4>⚠️ API Configuration Required</h4>
+                      <p>No API keys detected. To get job results, you need to configure at least one of these APIs:</p>
                       <ul>
-                          <li>SERPAPI_KEY - Get from <a href="https://serpapi.com" target="_blank">serpapi.com</a></li>
-                          <li>JSEARCH_API_KEY - Get from <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank">RapidAPI JSearch</a></li>
+                          <li><strong>SerpAPI:</strong> Get free API key from <a href="https://serpapi.com" target="_blank">serpapi.com</a></li>
+                          <li><strong>JSearch:</strong> Get free API key from <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank">RapidAPI JSearch</a></li>
                       </ul>
+                      <p><small>Add these as environment variables: SERPAPI_KEY and/or JSEARCH_API_KEY</small></p>
                   </div>
               `;
           }
 
-          // Show stats
+          // Show job statistics
           if (data.stats) {
-              const { serpApiJobs = 0, jsearchJobs = 0, totalUnique = 0 } = data.stats;
+              const { serpApiJobs = 0, jsearchJobs = 0, totalUnique = 0, duplicatesRemoved = 0 } = data.stats;
               output.innerHTML += `
                   <div class="stats">
-                      📊 Found <strong>${totalUnique}</strong> unique jobs
-                      (SerpAPI: ${serpApiJobs}, JSearch: ${jsearchJobs})
+                      <div>
+                          📊 Found <span class="stats-number">${totalUnique}</span> unique opportunities
+                      </div>
+                      <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
+                          SerpAPI: ${serpApiJobs} • JSearch: ${jsearchJobs}
+                          ${duplicatesRemoved > 0 ? ` • ${duplicatesRemoved} duplicates removed` : ''}
+                      </div>
                   </div>
               `;
           }
 
-          // Show errors if any
+          // Show any errors encountered
           if (data.errors && data.errors.length > 0) {
               output.innerHTML += `
                   <div class="error">
-                      <h4>⚠️ Some Issues Occurred:</h4>
+                      <h4>⚠️ Some Issues Encountered</h4>
                       <ul>
                           ${data.errors.map(error => `<li>${error}</li>`).join('')}
                       </ul>
@@ -369,21 +407,25 @@
               `;
           }
 
-          // Show jobs or no results message
+          // Display jobs
           if (data.jobs && data.jobs.length > 0) {
               data.jobs.forEach((job, index) => {
                   const jobCard = document.createElement("div");
                   jobCard.className = "job-card";
                   jobCard.innerHTML = `
-                      <div class="job-title">${job.title || "Untitled Role"}</div>
-                      <div class="job-company">🏢 ${job.company || "Unknown Company"}</div>
+                      <div class="job-title">${escapeHtml(job.title || "Untitled Position")}</div>
+                      <div class="job-company">🏢 ${escapeHtml(job.company || "Company Not Specified")}</div>
                       <div class="job-details">
-                          <span class="job-detail">📍 ${job.location || location}</span>
-                          <span class="job-detail">📅 ${job.date || "Date not specified"}</span>
-                          <span class="job-detail">🔗 ${job.source || "Unknown Source"}</span>
-                          ${job.salary && job.salary !== "Not specified" ? `<span class="job-detail">💰 ${job.salary}</span>` : ''}
+                          <span class="job-detail">📍 ${escapeHtml(job.location || location)}</span>
+                          <span class="job-detail">📅 ${escapeHtml(job.date || "Date not specified")}</span>
+                          <span class="job-detail">🔗 ${escapeHtml(job.source || "Unknown Source")}</span>
+                          ${job.salary && job.salary !== "Not specified" ? `<span class="job-detail">💰 ${escapeHtml(job.salary)}</span>` : ''}
                       </div>
-                      ${job.description ? `<div style="color: #666; font-size: 14px; margin: 10px 0; max-height: 60px; overflow: hidden;">${job.description.substring(0, 200)}...</div>` : ''}
+                      ${job.description && job.description !== "" ? `
+                          <div class="job-description">
+                              ${escapeHtml(job.description.substring(0, 300))}${job.description.length > 300 ? '...' : ''}
+                          </div>
+                      ` : ''}
                       <a href="${job.link}" target="_blank" class="job-link" rel="noopener noreferrer">
                           Apply Now →
                       </a>
@@ -395,64 +437,91 @@
               if (data.summary && data.summary !== "No jobs to analyze." && data.summary !== "AI analysis not available.") {
                   const summaryDiv = document.createElement("div");
                   summaryDiv.innerHTML = `
-                      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #28a745;">
-                          <h3 style="margin-top: 0; color: #28a745;">🤖 AI Market Analysis</h3>
-                          <div style="white-space: pre-wrap; line-height: 1.6;">${data.summary}</div>
+                      <div class="ai-summary">
+                          <h3>🤖 AI Market Analysis</h3>
+                          <div style="white-space: pre-wrap; line-height: 1.7;">
+                              ${escapeHtml(data.summary)}
+                          </div>
                       </div>
                   `;
                   output.appendChild(summaryDiv);
               }
           } else {
+              // No jobs found
               output.innerHTML += `
-                  <div style="text-align: center; padding: 40px; color: #666;">
+                  <div class="status-message">
                       <h3>😔 No Jobs Found</h3>
-                      <p>Try adjusting your search criteria:</p>
-                      <ul style="text-align: left; display: inline-block;">
-                          <li>Use broader job titles (e.g., "Developer" instead of "Senior Full Stack Developer")</li>
-                          <li>Try alternative location names (e.g., "Bangalore" vs "Bengaluru")</li>
-                          <li>Check if your API keys are properly configured</li>
-                      </ul>
+                      <p>We couldn't find any jobs matching your criteria. Here are some suggestions:</p>
+                      <div style="text-align: left; display: inline-block; margin-top: 20px;">
+                          <p><strong>Try adjusting your search:</strong></p>
+                          <ul style="text-align: left;">
+                              <li>Use broader job titles (e.g., "Manager" instead of "Senior Project Manager")</li>
+                              <li>Try alternative location names (e.g., "Bangalore" vs "Bengaluru")</li>
+                              <li>Remove specific qualifications from your search terms</li>
+                              <li>Consider nearby cities or "Remote" as location</li>
+                          </ul>
+                      </div>
                   </div>
               `;
           }
 
-          // Show debug info in development
-          if (data.debug) {
+          // Show debug information if available
+          if (data.debug && Object.keys(data.debug).length > 0) {
               const debugDiv = document.createElement("div");
               debugDiv.className = "debug-info";
               debugDiv.innerHTML = `
-                  <h4>Debug Information:</h4>
+                  <h4>🔧 Debug Information</h4>
                   <pre>${JSON.stringify(data.debug, null, 2)}</pre>
               `;
               output.appendChild(debugDiv);
           }
 
       } catch (error) {
-          console.error("Fetch error:", error);
+          console.error("Request failed:", error);
           output.innerHTML = `
               <div class="error">
-                  <h4>❌ Request Failed</h4>
+                  <h4>❌ Connection Failed</h4>
                   <p><strong>Error:</strong> ${error.message}</p>
-                  <p><strong>Troubleshooting:</strong></p>
-                  <ul>
-                      <li>Check if your API server is running</li>
-                      <li>Verify the API endpoint exists at /api/job-agent</li>
-                      <li>Check browser console for detailed error logs</li>
-                  </ul>
+                  <div style="margin-top: 15px;">
+                      <p><strong>Troubleshooting Steps:</strong></p>
+                      <ol>
+                          <li>Check if your API server is running</li>
+                          <li>Verify the API endpoint exists at <code>/api/job-agent</code></li>
+                          <li>Check browser console (F12) for detailed error logs</li>
+                          <li>Ensure CORS is configured if API is on different domain</li>
+                      </ol>
+                  </div>
               </div>
           `;
       } finally {
-          // Re-enable button
+          // Reset button
           button.disabled = false;
-          button.textContent = "🔍 Fetch Jobs";
+          button.innerHTML = '🔍 Search Jobs';
       }
   });
 
   // Allow Enter key to trigger search
   document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {
           document.getElementById('fetchJobs').click();
       }
+  });
+
+  // Utility function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+      const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+  }
+
+  // Auto-focus on first input when page loads
+  window.addEventListener('load', function() {
+      document.getElementById('jobType').focus();
   });
 </script>
 </body>
