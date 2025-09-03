@@ -280,8 +280,8 @@
 </head>
 <body>
 <div class="container">
-  <h2>🤖 Job Agent</h2>
-  <h3>Smarter job search. Powered by AI</h3>
+  <h2>🤖 AI Job Agent</h2>
+  <h3>Discover Your Next Opportunity</h3>
 
   <div class="form-row">
     <div class="form-group">
@@ -388,7 +388,7 @@
                           📊 Found <span class="stats-number">${totalUnique}</span> unique opportunities
                       </div>
                       <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
-                          //SerpAPI: ${serpApiJobs} • JSearch: ${jsearchJobs}
+                          SerpAPI: ${serpApiJobs} • JSearch: ${jsearchJobs}
                           ${duplicatesRemoved > 0 ? ` • ${duplicatesRemoved} duplicates removed` : ''}
                       </div>
                   </div>
@@ -500,6 +500,111 @@
       }
   });
 
+  // Email Report Functionality
+  document.getElementById("sendEmailBtn").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const emailBtn = document.getElementById("sendEmailBtn");
+      const userEmail = document.getElementById("userEmail").value.trim();
+      const emailSection = document.getElementById("emailSection");
+
+      // Remove any existing status messages
+      const existingStatus = emailSection.querySelector('.email-success, .email-error');
+      if (existingStatus) {
+          existingStatus.remove();
+      }
+
+      // Validation
+      if (!userEmail) {
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'email-error';
+          errorDiv.innerHTML = '❌ Please enter your email address';
+          emailSection.appendChild(errorDiv);
+          return;
+      }
+
+      if (!isValidEmail(userEmail)) {
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'email-error';
+          errorDiv.innerHTML = '❌ Please enter a valid email address';
+          emailSection.appendChild(errorDiv);
+          return;
+      }
+
+      if (!currentJobData || !currentJobData.results.jobs || currentJobData.results.jobs.length === 0) {
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'email-error';
+          errorDiv.innerHTML = '❌ No job data to send. Please search for jobs first.';
+          emailSection.appendChild(errorDiv);
+          return;
+      }
+
+      // Show loading state
+      emailBtn.disabled = true;
+      emailBtn.innerHTML = '📧 Sending...';
+
+      try {
+          const emailData = {
+              userEmail: userEmail,
+              jobType: currentJobData.searchParams.jobType,
+              location: currentJobData.searchParams.location,
+              jobs: currentJobData.results.jobs,
+              summary: currentJobData.results.summary,
+              stats: currentJobData.results.stats,
+              timestamp: currentJobData.timestamp
+          };
+
+          const response = await fetch(`${API_BASE_URL}/api/send-job-report`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(emailData)
+          });
+
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const result = await response.json();
+          console.log("Email result:", result);
+
+          // Show success message
+          const successDiv = document.createElement('div');
+          successDiv.className = 'email-success';
+          successDiv.innerHTML = `
+              ✅ Report sent successfully to ${userEmail}!
+              <br><small>Check your inbox (and spam folder) for the job report.</small>
+          `;
+          emailSection.appendChild(successDiv);
+
+          // Clear email input
+          document.getElementById("userEmail").value = '';
+
+      } catch (error) {
+          console.error("Email send failed:", error);
+
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'email-error';
+          errorDiv.innerHTML = `
+              ❌ Failed to send email: ${error.message}
+              <br><small>Please try again or check if the email service is configured properly.</small>
+          `;
+          emailSection.appendChild(errorDiv);
+      } finally {
+          // Reset button
+          emailBtn.disabled = false;
+          emailBtn.innerHTML = '📧 Send Report';
+      }
+  });
+
+  // Email validation helper
+  function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+  }
+
   // Allow Enter key to trigger search
   document.addEventListener('keypress', function(e) {
       if (e.key === 'Enter' && !document.getElementById('fetchJobs').disabled) {
@@ -524,10 +629,8 @@
       document.getElementById('jobType').focus();
   });
 </script>
-<!-- ✅ Copyright footer -->
+</body>
 <footer>
   © 2025 AbhiAI. All rights reserved.
 </footer>
-</body>
-
 </html>
