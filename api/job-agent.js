@@ -61,6 +61,7 @@ export default async function handler(req, res) {
 
       // Merge both sources
       const finalJobs = [...serpJobs, ...jsearchJobs];
+      console.log(`✅ Found ${finalJobs.length} jobs`);
 
       res.status(200).json({
         success: true,
