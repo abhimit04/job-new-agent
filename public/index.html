@@ -325,7 +325,7 @@
   // If your API is on a different port/domain, change this to:
   // const API_BASE_URL = 'http://localhost:3000'; // For local development
   // const API_BASE_URL = 'https://your-api-domain.com'; // For production
-
+  let currentJobData = null;
   document.getElementById("fetchJobs").addEventListener("click", async (e) => {
       e.preventDefault();
 
@@ -518,6 +518,25 @@
   document.getElementById("sendEmailBtn").addEventListener("click", async (e) => {
       e.preventDefault();
 
+      // new code
+  try {
+      const response = await fetch(apiUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' }});
+      const data = await response.json();
+
+      // ✅ Store job data for email
+      currentJobData = {
+          searchParams: { jobType, location },
+          results: {
+              jobs: data.jobs || [],
+              summary: data.summary || "",
+              stats: data.stats || {}
+          },
+          timestamp: new Date().toISOString()
+      };
+
+      if (currentJobData.results.jobs.length > 0) {
+          document.getElementById("emailSection").style.display = "block";
+      }
       const emailBtn = document.getElementById("sendEmailBtn");
       const userEmail = document.getElementById("userEmail").value.trim();
       const emailSection = document.getElementById("emailSection");
