@@ -519,7 +519,7 @@
       e.preventDefault();
 
       // new code
-  try {
+
       const response = await fetch(apiUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' }});
       const data = await response.json();
 
@@ -532,7 +532,7 @@
               stats: data.stats || {}
           },
           timestamp: new Date().toISOString()
-      };
+
 
       if (currentJobData.results.jobs.length > 0) {
           document.getElementById("emailSection").style.display = "block";
