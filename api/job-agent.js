@@ -39,7 +39,7 @@ export default async function handler(req, res) {
 
       // ===== Fetch from JSearch =====
       const jsearchResponse = await fetch(
-        `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(location)}&page=1&num_pages=3`,
+        `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(location)}&page=1&num_pages=5`,
         {
           method: "GET",
           headers: {
