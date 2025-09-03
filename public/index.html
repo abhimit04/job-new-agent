@@ -304,7 +304,21 @@
     </div>
   </div>
 </div>
+<!--Email section-->
+<div id="emailSection" class="email-section" style="display:none;">
+  <h3>📧 Send Job Report</h3>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="userEmail">Your Email</label>
+      <input type="email" id="userEmail" placeholder="Enter your email address">
+    </div>
+    <div class="form-group" style="flex:0 0 auto; display:flex; align-items:flex-end;">
+      <button id="sendEmailBtn" class="search-btn">📧 Send Report</button>
+    </div>
+  </div>
+</div>
 
+<!--email-section ends here-->
 <script>
   // Configuration - Update this URL to match your API endpoint
   const API_BASE_URL = window.location.origin; // Uses current domain
