@@ -185,6 +185,9 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
     }
+    .job-link:active {
+        transform: translateY(0);
+    }
     .stats {
         background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
         padding: 20px;
@@ -261,6 +264,22 @@
         font-family: 'Courier New', monospace;
         font-size: 12px;
     }
+    .email-success {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border-left: 4px solid #28a745;
+    }
+    .email-error {
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      color: #721c24;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border-left: 4px solid #dc3545;
+    }
     @media (max-width: 768px) {
         .form-row {
             flex-direction: column;
@@ -277,6 +296,14 @@
         }
     }
   </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    // 2. Initialize EmailJS with your Public Key
+    (function() {
+
+        emailjs.init("3-M9MX4e2WHBfILgS");
+    })();
+  </script>
 </head>
 <body>
 <div class="container">
@@ -304,7 +331,6 @@
     </div>
   </div>
 </div>
-<!--Email section-->
 <div id="emailSection" class="email-section" style="display:none;">
   <h3>📧 Send Job Report</h3>
   <div class="form-row">
@@ -318,7 +344,6 @@
   </div>
 </div>
 
-<!--email-section end here-->
 <script>
   // Configuration - Update this URL to match your API endpoint
   const API_BASE_URL = window.location.origin; // Uses current domain
@@ -333,6 +358,7 @@
       const output = document.getElementById("output");
       const jobType = document.getElementById("jobType").value.trim();
       const location = document.getElementById("location").value.trim();
+      const emailSection = document.getElementById("emailSection");
 
       // Validation
       if (!jobType || !location) {
@@ -343,6 +369,7 @@
       // Show loading state
       button.disabled = true;
       button.innerHTML = '⏳ Searching...';
+      emailSection.style.display = 'none'; // Hide email section during search
       output.innerHTML = `
           <div class="loading">
               <div class="spinner"></div>
@@ -374,6 +401,11 @@
 
           const data = await response.json();
           console.log("API Response:", data);
+          currentJobData = {
+              results: data,
+              searchParams: { jobType, location },
+              timestamp: new Date().toLocaleString()
+          };
 
           // Clear output
           output.innerHTML = "";
@@ -460,6 +492,7 @@
                   `;
                   output.appendChild(summaryDiv);
               }
+              emailSection.style.display = 'block'; // Show email section
           } else {
               // No jobs found
               output.innerHTML += `
@@ -513,30 +546,11 @@
           button.innerHTML = '🔍 Search Jobs';
       }
   });
-  console.log("You start email script here");
-  // Email Report Functionality
+
+  // 3. Email Report Functionality using EmailJS
   document.getElementById("sendEmailBtn").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // new code
-
-      const response = await fetch(apiUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' }});
-      const data = await response.json();
-
-      // ✅ Store job data for email
-      currentJobData = {
-          searchParams: { jobType, location },
-          results: {
-              jobs: data.jobs || [],
-              summary: data.summary || "",
-              stats: data.stats || {}
-          },
-          timestamp: new Date().toISOString()
-
-
-      if (currentJobData.results.jobs.length > 0) {
-          document.getElementById("emailSection").style.display = "block";
-      }
       const emailBtn = document.getElementById("sendEmailBtn");
       const userEmail = document.getElementById("userEmail").value.trim();
       const emailSection = document.getElementById("emailSection");
@@ -577,31 +591,24 @@
       emailBtn.innerHTML = '📧 Sending...';
 
       try {
-          const emailData = {
-              userEmail: userEmail,
-              jobType: currentJobData.searchParams.jobType,
+          // Prepare the template parameters for EmailJS
+          const templateParams = {
+              to_email: userEmail,
+              job_type: currentJobData.searchParams.jobType,
               location: currentJobData.searchParams.location,
-              jobs: currentJobData.results.jobs,
-              summary: currentJobData.results.summary,
-              stats: currentJobData.results.stats,
-              timestamp: currentJobData.timestamp
+              job_count: currentJobData.results.stats.totalUnique,
+              report_summary: currentJobData.results.summary || "No AI summary available.",
+              // Create a structured list of jobs for the email template
+              jobs_list: currentJobData.results.jobs.map(job =>
+                  `• <strong>${escapeHtml(job.title)}</strong> at ${escapeHtml(job.company)}<br>
+                  <em>Location:</em> ${escapeHtml(job.location)} | <em>Source:</em> ${escapeHtml(job.source)}<br>
+                  <a href="${job.link}" target="_blank">View Job</a>`
+              ).join("<br><br>")
           };
 
-          const response = await fetch(`${API_BASE_URL}/api/send-job-report`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(emailData)
-          });
-
-          if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          const result = await response.json();
-          console.log("Email result:", result);
+          // Send the email using the EmailJS SDK
+          const result = await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams);
+          console.log("Email send result:", result);
 
           // Show success message
           const successDiv = document.createElement('div');
@@ -617,12 +624,11 @@
 
       } catch (error) {
           console.error("Email send failed:", error);
-
           const errorDiv = document.createElement('div');
           errorDiv.className = 'email-error';
           errorDiv.innerHTML = `
-              ❌ Failed to send email: ${error.message}
-              <br><small>Please try again or check if the email service is configured properly.</small>
+              ❌ Failed to send email: ${error.text || error.message}
+              <br><small>Please try again or check your EmailJS configuration.</small>
           `;
           emailSection.appendChild(errorDiv);
       } finally {
