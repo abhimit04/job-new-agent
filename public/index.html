@@ -252,6 +252,35 @@
         align-items: center;
         gap: 10px;
     }
+    .summary-markdown {
+  line-height: 1.7;
+  font-size: 15px;
+  color: #444;
+    }
+
+.summary-markdown h2,
+.summary-markdown h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 1px solid #e1e5e9;
+  padding-bottom: 5px;
+   }
+
+.summary-markdown ul {
+  margin: 10px 0 10px 20px;
+  list-style: disc;
+}
+
+.summary-markdown li {
+  margin-bottom: 6px;
+}
+
+.summary-markdown strong {
+  color: #000;
+}
+
     .debug-info {
         background: #fff3cd;
         border: 1px solid #ffeaa7;
@@ -304,7 +333,7 @@
     </div>
   </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
   // Configuration - Update this URL to match your API endpoint
   const API_BASE_URL = window.location.origin; // Uses current domain
@@ -439,8 +468,8 @@
                   summaryDiv.innerHTML = `
                       <div class="ai-summary">
                           <h3>🤖 AI Market Analysis</h3>
-                          <div style="white-space: pre-wrap; line-height: 1.7;">
-                              ${escapeHtml(data.summary)}
+                          <div class="summary-markdown">
+                              ${marked.parse(data.summary)}
                           </div>
                       </div>
                   `;
