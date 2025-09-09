@@ -2,6 +2,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import nodemailer from "nodemailer";
 import { marked } from "marked";
 
+// ====== Simple In-Memory Cache ======
+const cache = new Map();
+const CACHE_TTL = 1000 * 60 * 10; // 10 minutes
+
 export default async function handler(req, res) {
   try {
     const serpApiKey = process.env.SERPAPI_KEY;
@@ -9,6 +13,14 @@ export default async function handler(req, res) {
     const jsearchApiKey = process.env.JSEARCH_API_KEY;
 
     const { jobType = "Software Engineer", location = "Bangalore, India" } = req.query;
+
+    const cacheKey = `${jobType.toLowerCase()}_${location.toLowerCase()}`;
+    const cached = cache.get(cacheKey);
+
+    if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+      console.log("⚡ Serving from cache:", cacheKey);
+      return res.status(200).json(cached.data);
+    }
 
     console.log("🚀 Starting job search for:", { jobType, location });
     console.log("🔑 API Keys available:", {
@@ -22,93 +34,89 @@ export default async function handler(req, res) {
     const errors = [];
     let nextPageToken = null;
 
-    // ========== Fetch from SerpAPI ==========
-if (serpApiKey) {
-  try {
-    console.log("📡 Fetching from SerpAPI with pagination...");
+    // ===== SerpAPI fetch (unchanged) =====
+    if (serpApiKey) {
+      try {
+        console.log("📡 Fetching from SerpAPI with pagination...");
 
-    let nextPageToken = null;
-    for (let page = 0; page < 3; page++) { // fetch up to 3 pages
-      const params = new URLSearchParams({
-        engine: "google_jobs",
-        q: jobType,
-        location: location,
-        api_key: serpApiKey,
-        hl: "en",
-        gl: "in"
-      });
+        let nextPageToken = null;
+        for (let page = 0; page < 3; page++) {
+          const params = new URLSearchParams({
+            engine: "google_jobs",
+            q: jobType,
+            location: location,
+            api_key: serpApiKey,
+            hl: "en",
+            gl: "in"
+          });
 
-      // Add next_page_token if available
-      if (nextPageToken) {
-        params.set("next_page_token", nextPageToken);
+          if (nextPageToken) {
+            params.set("next_page_token", nextPageToken);
+          }
+
+          const url = `https://serpapi.com/search.json?${params.toString()}`;
+          console.log(`🔍 SerpAPI Page ${page + 1}:`, url.replace(serpApiKey, "***"));
+
+          const response = await fetch(url, {
+            headers: { "User-Agent": "Mozilla/5.0 (compatible; JobAgent/1.0)" }
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`❌ SerpAPI Error ${response.status}:`, errorText);
+            errors.push(`SerpAPI Error ${response.status}: ${errorText}`);
+            break;
+          }
+
+          const data = await response.json();
+          console.log("📊 SerpAPI Response:", {
+            jobsCount: data.jobs_results?.length || 0,
+            hasNextPage: !!data.serpapi_pagination?.next_page_token
+          });
+
+          if (data.jobs_results?.length > 0) {
+            const pageJobs = data.jobs_results.map((job, index) => ({
+              id: job.job_id || `serp-${page}-${index}`,
+              title: job.title || "No Title",
+              company: job.company_name || "Unknown Company",
+              location: job.location || location,
+              date: job.detected_extensions?.posted_at ||
+                    job.extensions?.find(ext => ext.includes("ago"))?.trim() ||
+                    "Date not specified",
+              source: job.via || "Google Jobs",
+              link: job.apply_options?.[0]?.link ||
+                    job.share_link ||
+                    `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company_name)}`,
+              description: job.description || "",
+              salary: job.detected_extensions?.salary || "Not specified"
+            }));
+
+            serpJobs.push(...pageJobs);
+            console.log(`✅ Added ${pageJobs.length} jobs from SerpAPI page ${page + 1}`);
+          } else {
+            console.log(`⚠️ No jobs found on SerpAPI page ${page + 1}`);
+            break;
+          }
+
+          if (data.serpapi_pagination?.next_page_token) {
+            nextPageToken = data.serpapi_pagination.next_page_token;
+            console.log(`➡️ Found next_page_token for page ${page + 2}`);
+          } else {
+            console.log("⏹️ No more pages available.");
+            break;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      } catch (error) {
+        console.error("❌ SerpAPI fetch failed:", error.message);
+        errors.push(`SerpAPI Error: ${error.message}`);
       }
-
-      const url = `https://serpapi.com/search.json?${params.toString()}`;
-      console.log(`🔍 SerpAPI Page ${page + 1}:`, url.replace(serpApiKey, "***"));
-
-      const response = await fetch(url, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; JobAgent/1.0)" }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`❌ SerpAPI Error ${response.status}:`, errorText);
-        errors.push(`SerpAPI Error ${response.status}: ${errorText}`);
-        break;
-      }
-
-      const data = await response.json();
-      console.log("📊 SerpAPI Response:", {
-        jobsCount: data.jobs_results?.length || 0,
-        hasNextPage: !!data.serpapi_pagination?.next_page_token
-      });
-
-      if (data.jobs_results?.length > 0) {
-        const pageJobs = data.jobs_results.map((job, index) => ({
-          id: job.job_id || `serp-${page}-${index}`,
-          title: job.title || "No Title",
-          company: job.company_name || "Unknown Company",
-          location: job.location || location,
-          date: job.detected_extensions?.posted_at ||
-                job.extensions?.find(ext => ext.includes("ago"))?.trim() ||
-                "Date not specified",
-          source: job.via || "Google Jobs",
-          link: job.apply_options?.[0]?.link ||
-                job.share_link ||
-                `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company_name)}`,
-          description: job.description || "",
-          salary: job.detected_extensions?.salary || "Not specified"
-        }));
-
-        serpJobs.push(...pageJobs);
-        console.log(`✅ Added ${pageJobs.length} jobs from SerpAPI page ${page + 1}`);
-      } else {
-        console.log(`⚠️ No jobs found on SerpAPI page ${page + 1}`);
-        break;
-      }
-
-      // Prepare token for next loop
-      if (data.serpapi_pagination?.next_page_token) {
-        nextPageToken = data.serpapi_pagination.next_page_token;
-        console.log(`➡️ Found next_page_token for page ${page + 2}`);
-      } else {
-        console.log("⏹️ No more pages available.");
-        break;
-      }
-
-      // Delay so SerpAPI can activate token
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    } else {
+      console.log("⚠️ SerpAPI key not provided");
     }
-  } catch (error) {
-    console.error("❌ SerpAPI fetch failed:", error.message);
-    errors.push(`SerpAPI Error: ${error.message}`);
-  }
-} else {
-  console.log("⚠️ SerpAPI key not provided");
-}
 
-
-    // ========== Fetch from JSearch ==========
+    // ===== JSearch fetch (unchanged) =====
     if (jsearchApiKey) {
       try {
         console.log("📡 Fetching from JSearch...");
@@ -121,7 +129,6 @@ if (serpApiKey) {
           remote_jobs_only: "false"
         });
 
-        // Add location if provided
         if (location) {
           params.set("location", location);
         }
@@ -184,66 +191,36 @@ if (serpApiKey) {
       console.log("⚠️ JSearch API key not provided");
     }
 
-    // ========== Combine and Deduplicate ==========
-    console.log("📊 Raw job counts:", {
-      serpApi: serpJobs.length,
-      jsearch: jsearchJobs.length,
-      total: serpJobs.length + jsearchJobs.length
-    });
-
-    // Combine all jobs
+    // ===== Combine & Deduplicate =====
     const allJobsRaw = [...serpJobs, ...jsearchJobs];
 
-    // Enhanced deduplication
     const seen = new Map();
     const finalJobs = allJobsRaw.filter((job) => {
-      // Create a more robust key for deduplication
       const normalizeString = (str) => str?.toLowerCase().trim().replace(/[^\w\s]/g, '') || '';
       const key = `${normalizeString(job.title)}_${normalizeString(job.company)}`;
 
-      if (seen.has(key)) {
-        console.log(`🔄 Duplicate found: ${job.title} at ${job.company}`);
-        return false;
-      }
+      if (seen.has(key)) return false;
       seen.set(key, true);
       return true;
     });
 
     console.log(`✅ After deduplication: ${finalJobs.length} unique jobs`);
 
-    // ========== Handle empty results ==========
-    if (finalJobs.length === 0) {
-      const message = errors.length > 0 ?
-        `No jobs found. Errors encountered: ${errors.join('; ')}` :
-        "No jobs found from any source.";
+    // ===== Limit to top 20 jobs =====
+    const limitedJobs = finalJobs.slice(0, 20);
 
-      return res.status(200).json({
-        success: true,
-        message,
-        jobs: [],
-        summary: "No jobs to analyze.",
-        errors,
-        debug: {
-          serpApiConfigured: !!serpApiKey,
-          jsearchConfigured: !!jsearchApiKey,
-          searchParams: { jobType, location }
-        },
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    // ========== AI Summarization ==========
+    // ====== AI Summarization (unchanged except limitedJobs) ======
     let aiAnalysis = "AI analysis not available.";
-    if (geminiApiKey && finalJobs.length > 0) {
+    if (geminiApiKey && limitedJobs.length > 0) {
       try {
         console.log("🤖 Generating AI analysis...");
         const genAI = new GoogleGenerativeAI(geminiApiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
-Analyze these ${finalJobs.length} job postings for "${jobType}" roles in "${location}":
+Analyze these ${limitedJobs.length} job postings for "${jobType}" roles in "${location}":
 
-${JSON.stringify(finalJobs.slice(0, 20), null, 2)}
+${JSON.stringify(limitedJobs, null, 2)}
 
 Provide a structured analysis in Markdown format with these sections:
 
@@ -282,58 +259,11 @@ Keep the analysis factual and based only on the provided data.
       }
     }
 
-    // ========== Email (Optional) ==========
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_TO && finalJobs.length > 0) {
-      try {
-        console.log("📧 Sending email report...");
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const jobListHtml = finalJobs.slice(0, 20).map(job =>
-          `<li><strong>${job.title}</strong> at ${job.company}<br>
-           📍 ${job.location} | 📅 ${job.date}<br>
-           <a href="${job.link}" target="_blank">Apply via ${job.source}</a></li>`
-        ).join("");
-
-        const htmlContent = marked.parse(aiAnalysis);
-
-        await transporter.sendMail({
-          from: `"AI Job Agent" <${process.env.EMAIL_USER}>`,
-          to: process.env.EMAIL_TO,
-          subject: `🎯 ${finalJobs.length} ${jobType} Jobs Found in ${location}`,
-          html: `
-            <h2>Job Search Report</h2>
-            <p><strong>Search:</strong> ${jobType} in ${location}</p>
-            <p><strong>Found:</strong> ${finalJobs.length} unique opportunities</p>
-
-            <h3>Top Jobs</h3>
-            <ol>${jobListHtml}</ol>
-
-            <hr>
-            <h3>Market Analysis</h3>
-            ${htmlContent}
-
-            <hr>
-            <p><small>Report generated on ${new Date().toLocaleString()}</small></p>
-          `,
-        });
-        console.log("✅ Email sent successfully");
-      } catch (emailError) {
-        console.error("❌ Email failed:", emailError.message);
-        errors.push(`Email Error: ${emailError.message}`);
-      }
-    }
-
-    // ========== Final Response ==========
-    res.status(200).json({
+    // ===== Final Response =====
+    const responseData = {
       success: true,
-      message: `Successfully found ${finalJobs.length} ${jobType} jobs in ${location}`,
-      jobs: finalJobs,
+      message: `Successfully found ${limitedJobs.length} ${jobType} jobs in ${location}`,
+      jobs: limitedJobs,
       summary: aiAnalysis,
       stats: {
         serpApiJobs: serpJobs.length,
@@ -344,7 +274,12 @@ Keep the analysis factual and based only on the provided data.
       searchParams: { jobType, location },
       errors: errors.length > 0 ? errors : undefined,
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    // Save to cache
+    cache.set(cacheKey, { data: responseData, timestamp: Date.now() });
+
+    res.status(200).json(responseData);
 
   } catch (err) {
     console.error("❌ Fatal error:", err);
