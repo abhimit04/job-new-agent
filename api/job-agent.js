@@ -257,7 +257,7 @@ if (serpApiKey) {
       try {
         console.log("🤖 Generating AI analysis...");
         const genAI = new GoogleGenerativeAI(geminiApiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
 Analyze these ${finalJobs.length} job postings for "${jobType}" roles in "${location}":
